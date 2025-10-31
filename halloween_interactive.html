@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HAPPY HALLOWEEN ROOT!! Interactive Demo (Sprites)</title>
+	</head>
+    <style>
+        /* FULL-SCREEN STYLES */
+        body {
+            /* Use YOUR original image for the overall background */
+            background-image: url('1000169841.jpg');
+            background-size: contain;
+            background-position: center bottom; /* Anchored to the bottom */
+            background-attachment: fixed;
+            
+            color: white;
+            font-family: 'Arial Black', sans-serif;
+            margin: 0;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: url('https://icons.iconarchive.com/icons/google/noto-emoji-halloween/32/52771-jack-o-lantern-icon.png'), auto; 
+        }
+
+        /* HEADER AND SCOREBOARD */
+        #header {
+            position: absolute;
+            top: 20px;
+            width: 90%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            border: 2px solid red;
+            z-index: 100;
+        }
+
+        #title {
+            color: red;
+            font-size: 2em;
+            text-shadow: 0 0 10px red;
+            animation: drip 1s infinite alternate;
+            cursor: pointer; 
+        }
+        @keyframes drip {
+            from { transform: translateY(0); }
+            to { transform: translateY(2px); }
+        }
+        
+        #scoreboard {
+            font-size: 1.5em;
+        }
+
+        /* CHARACTER CONTAINER */
+        #party-scene {
+            position: relative;
+            width: 100vw;
+            height: 80vh; 
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            z-index: 50;
+        }
+
+        /* 👻 SPRITE CHARACTER BASE STYLES */
+        .character {
+            position: absolute;
+            /* Dimensions set to a general size, adjust height/width for each sprite if needed */
+            width: 150px; 
+            height: 300px; 
+            
+            /* KEY CHANGE: Using the PNG file as the background */
+            background-repeat: no-repeat;
+            background-size: contain; 
+            background-position: bottom center; 
+            
+            font-size: 0; 
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+            cursor: pointer;
+            box-shadow: 0 0 0px rgba(255, 255, 255, 0); 
+        }
+
+        .character:hover {
+            transform: scale(1.05) translateY(-5px);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.7); 
+        }
+
+        /* 🧍 SPECIFIC SPRITE AND SCREEN POSITIONING */
+        /* Only need to set the image source and where it sits on the screen */
+        #leopard { 
+            left: 25%; bottom: 10%;
+            background-image: url('leopard.png');
+			height: 150px; /* Adjust height for the smaller sprite */
+        }
+        #stitch { 
+            left: 35%; bottom: 10%;
+            background-image: url('stitch.png'); 
+            height: 150px; /* Adjust height for the smaller sprite */
+        }
+        #groot { 
+            left: 45%; bottom: 10%;
+            background-image: url('groot.png'); 
+			height: 150px; /* Adjust height for the smaller sprite */
+        }
+        #rabbit { 
+            left: 58%; bottom: 10%;
+            background-image: url('rabbit.png'); 
+			height: 150px; /* Adjust height for the smaller sprite */
+        }
+        #bear { 
+            left: 70%; bottom: 10%;
+            background-image: url('bear.png'); 
+            height: 150px; /* Adjust height for the slightly shorter sprite */
+        }
+
+        /* CANDY, FEEDBACK, AND JUMPSCARE STYLES (Kept from previous version) */
+        .candy {
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: yellow;
+            border: 2px solid orange;
+            text-align: center;
+            line-height: 25px;
+            font-size: 1.5em; 
+            cursor: pointer;
+            box-shadow: 0 0 5px yellow;
+            animation: float 2s infinite alternate ease-in-out;
+            z-index: 99;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(-1deg); }
+            100% { transform: translateY(-10px) rotate(1deg); }
+        }
+        .feedback {
+            position: absolute;
+            font-size: 2em;
+            animation: flyup 1s forwards;
+            pointer-events: none;
+            z-index: 200;
+        }
+        @keyframes flyup {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-50px); }
+        }
+        #game-over {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            text-align: center;
+            z-index: 300;
+        }
+        #game-over button {
+            padding: 15px 30px;
+            font-size: 0.6em;
+            margin-top: 20px;
+            cursor: pointer;
+            background: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        #game-over button:hover {
+            background: darkred;
+        }
+        #jumpscare-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 5em;
+            color: red;
+            z-index: 500;
+        }
+		/* --- MOBILE SPECIFIC STYLES (Max Width 768px) --- */
+@media (max-width: 768px) {
+
+    /* 1. Header/Scoreboard adjustments */
+    #header {
+        flex-direction: column; /* Stack the title and scoreboard vertically */
+        text-align: center;
+    }
+    #title {
+        font-size: 1.5em; /* Make the title smaller */
+    }
+    #scoreboard {
+        font-size: 1em; /* Make the scoreboard smaller */
+        margin-top: 5px;
+    }
+
+    /* 2. Character Container Adjustment */
+    #party-scene {
+        /* Reduce the height the scene takes up, giving the header/footer room */
+        height: 60vh; 
+    }
+
+    /* 3. Character Positioning and Size (The crucial part) */
+    .character {
+        /* Make the default character size smaller on mobile */
+        width: 100px; 
+        height: 200px; 
+        bottom: 5%;
+    }
+
+    /* Redistribute the characters to prevent crowding */
+    #leopard { 
+        left: 5%; /* Push left */
+    }
+    #stitch { 
+        left: 25%; /* Move Stitch closer to the center */
+        height: 100px;
+    }
+    #groot { 
+        left: 45%; /* Keep Groot near the center */
+    }
+    #rabbit { 
+        left: 65%; /* Move Rabbit right */
+    }
+    #bear { 
+        left: 80%; /* Push Bear to the far right */
+        height: 150px; 
+    }
+
+    /* 4. Background Adjustment (Optional) */
+    body {
+        /* Ensures the background image is anchored correctly on small screens */
+        background-position: center bottom;
+    }
+}
+
+    </style>
+</head>
+<body>
+
+    <audio id="cackleSound" src="evil_cackle.mp3" preload="auto"></audio>
+    <audio id="grootSound" src="groot_leaf.mp3" preload="auto"></audio>
+    <audio id="jazzSound" src="jazz_wink.mp3" preload="auto"></audio>
+
+
+    <div id="header">
+        <div id="title">HAPPY HALLOWEEN ROOT!!</div>
+        <div id="scoreboard">
+            Candy: <span id="candy-count">0</span> / 10 | Time: <span id="timer">30</span>s
+        </div>
+    </div>
+
+    <div id="party-scene">
+        <div id="leopard" class="character"></div>
+        <div id="stitch" class="character"></div>
+        <div id="groot" class="character"></div>
+        <div id="rabbit" class="character"></div>
+        <div id="bear" class="character"></div>
+    </div>
+
+    <div id="game-over">
+        <div id="final-message"></div>
+        <button onclick="startGame()">Play Again?</button>
+    </div>
+
+    <div id="jumpscare-overlay">
+        😱 BOO! 😱
+    </div>
+
+    <script>
+        // --- CONSTANTS AND ELEMENTS ---
+        const SCENE = document.getElementById('party-scene');
+        const CANDY_COUNT_ELEM = document.getElementById('candy-count');
+        const TIMER_ELEM = document.getElementById('timer');
+        const GAME_OVER_ELEM = document.getElementById('game-over');
+        const FINAL_MESSAGE_ELEM = document.getElementById('final-message');
+        const TITLE_ELEM = document.getElementById('title');
+        const JUMPSCARE_ELEM = document.getElementById('jumpscare-overlay');
+        
+        const STITCH_ELEM = document.getElementById('stitch');
+        const BEAR_ELEM = document.getElementById('bear');
+        const LEOPARD_ELEM = document.getElementById('leopard');
+        const GROOT_ELEM = document.getElementById('groot');
+        const RABBIT_ELEM = document.getElementById('rabbit');
+        
+        const CACKLE_SOUND = document.getElementById('cackleSound');
+        const GROOT_SOUND = document.getElementById('grootSound');
+        const JAZZ_SOUND = document.getElementById('jazzSound');
+        
+        let candyCount = 0;
+        let timeLeft = 30;
+        let gameInterval;
+        let candySpawnInterval;
+
+        // --- GAME LOGIC (UNCHANGED) ---
+
+        function startGame() {
+            candyCount = 0;
+            timeLeft = 30;
+            CANDY_COUNT_ELEM.textContent = candyCount;
+            TIMER_ELEM.textContent = timeLeft;
+            GAME_OVER_ELEM.style.display = 'none';
+
+            document.querySelectorAll('.candy').forEach(c => c.remove());
+
+            gameInterval = setInterval(updateGame, 1000);
+            candySpawnInterval = setInterval(spawnCandy, 700);
+
+            // Assign ALL character interactions
+            STITCH_ELEM.onclick = handleStitchTrick;
+            BEAR_ELEM.onclick = handleBearTreat;
+            LEOPARD_ELEM.onclick = handleLeopardWink;
+            GROOT_ELEM.onclick = handleGrootLeaf;
+            RABBIT_ELEM.onclick = handleRabbitHop;
+            TITLE_ELEM.onclick = handleJumpscare;
+        }
+
+        function endGame(message) {
+            clearInterval(gameInterval);
+            clearInterval(candySpawnInterval);
+            document.querySelectorAll('.character').forEach(c => c.onclick = null);
+            TITLE_ELEM.onclick = null;
+            
+            FINAL_MESSAGE_ELEM.textContent = message;
+            GAME_OVER_ELEM.style.display = 'flex';
+        }
+
+        function updateGame() {
+            timeLeft--;
+            TIMER_ELEM.textContent = timeLeft;
+
+            if (candyCount >= 10) {
+                endGame(`🎃 VICTORY! You collected ${candyCount} candies! You win the party! 🍬`);
+                return;
+            }
+
+            if (timeLeft <= 0) {
+                endGame(`👻 FAILURE! Time's up! You only collected ${candyCount} candies. Try again!`);
+            }
+        }
+
+        function spawnCandy(isBonus = false) {
+            if (timeLeft <= 0 || candyCount >= 10) return;
+
+            const candy = document.createElement('div');
+            candy.className = 'candy' + (isBonus ? ' treat' : '');
+            candy.textContent = isBonus ? '🍭' : '⭐';
+            
+            const posX = 10 + Math.random() * 80 + '%';
+            const posY = 10 + Math.random() * 60 + '%';
+            
+            candy.style.left = posX;
+            candy.style.top = posY;
+            
+            candy.onclick = function() {
+                collectCandy(candy);
+            };
+
+            SCENE.appendChild(candy);
+        }
+
+        function collectCandy(candyElement) {
+            if (timeLeft <= 0 || candyCount >= 10) return;
+
+            candyCount++;
+            CANDY_COUNT_ELEM.textContent = candyCount;
+            candyElement.remove();
+
+            showFeedback(candyElement, '+1', 'yellow');
+
+            if (candyCount >= 10) {
+                updateGame();
+            }
+        }
+        
+        // --- CHARACTER-SPECIFIC FUN INTERACTIONS (UNCHANGED) ---
+
+        function handleJumpscare() {
+            CACKLE_SOUND.play(); 
+            JUMPSCARE_ELEM.style.display = 'flex';
+            setTimeout(() => {
+                JUMPSCARE_ELEM.style.display = 'none';
+            }, 500); 
+        }
+
+        function handleLeopardWink() {
+            JAZZ_SOUND.play(); 
+            showFeedback(this, "Smooth Operator!", 'lightblue');
+            this.style.transform = 'rotate(-5deg) scale(1.1)'; 
+            setTimeout(() => { this.style.transform = 'scale(1.05) translateY(-5px)'; }, 100);
+        }
+
+        function handleGrootLeaf() {
+            GROOT_SOUND.play(); 
+            showFeedback(this, "I am GROOT! 🍃", 'lightgreen');
+        }
+        
+        function handleRabbitHop() {
+            showFeedback(this, "Hippity Hoppity!", 'white');
+            this.style.transform = 'translateY(-20px) scale(1.1)';
+            setTimeout(() => { this.style.transform = 'scale(1.05) translateY(-5px)'; }, 150);
+        }
+
+        function handleStitchTrick() {
+            if (candyCount >= 2 && timeLeft > 0) {
+                candyCount = Math.max(0, candyCount - 2);
+                CANDY_COUNT_ELEM.textContent = candyCount;
+                showFeedback(STITCH_ELEM, '-2! TRICKED! 😈', 'red');
+            } else {
+                showFeedback(STITCH_ELEM, 'No tricks yet!');
+            }
+        }
+
+        function handleBearTreat() {
+            if (timeLeft > 0) {
+                showFeedback(BEAR_ELEM, '+3 TREAT! 🍬', 'pink');
+                spawnCandy(true);
+                setTimeout(() => spawnCandy(true), 200);
+                setTimeout(() => spawnCandy(true), 400);
+            }
+        }
+        
+        // --- FEEDBACK UTILITY (UNCHANGED) ---
+        function showFeedback(targetElement, text, color = 'yellow') {
+            const feedback = document.createElement('div');
+            feedback.className = 'feedback';
+            feedback.textContent = text;
+            feedback.style.color = color;
+            
+            const rect = targetElement.getBoundingClientRect();
+            feedback.style.left = rect.left + rect.width / 2 + 'px';
+            feedback.style.top = rect.top + 'px';
+
+            document.body.appendChild(feedback);
+
+            setTimeout(() => feedback.remove(), 1000);
+        }
+
+        // Initialize the game prompt on load
+        document.addEventListener('DOMContentLoaded', () => {
+            GAME_OVER_ELEM.style.display = 'flex';
+            FINAL_MESSAGE_ELEM.textContent = "Welcome to the Interactive Party! Collect 10 candies. Try clicking the characters AND the red title text!";
+        });
+
+    </script>
+</body>
+</html>
